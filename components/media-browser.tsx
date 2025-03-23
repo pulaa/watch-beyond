@@ -16,6 +16,10 @@ import {
 } from "@heroui/autocomplete";
 import { Avatar } from "@heroui/avatar";
 import MediaGrid from "./media-grid";
+import { movieGenres } from "@/data/movieGenres";
+import { tvGenres } from "@/data/tvGenres";
+import { useSearchStore } from "@/store/use-search-store";
+import { IconArrowsSort, IconBrandYoutube, IconCategory, IconLanguage, IconTimezone } from "@tabler/icons-react";
 const sortOptions = [
   { value: "popularity.desc", label: "Popularity (High to Low)" },
   { value: "popularity.asc", label: "Popularity (Low to High)" },
@@ -28,9 +32,10 @@ const sortOptions = [
 ];
 
 export default function MediaBrowser() {
+  const { searchQuery } = useSearchStore();
+
   const searchParams = useSearchParams();
   const router = useRouter();
-  const [searchInput, setSearchInput] = useState("");
 
   // Create a single filters object from URL params or defaults
   const [filters, setFilters] = useState<MediaFilters>({
@@ -65,170 +70,159 @@ export default function MediaBrowser() {
     setFilters((prev) => ({ ...prev, ...updates }));
   };
 
-  const clearSearch = () => {
-    setSearchInput("");
-  };
-  const handleProvidersChange = (keys: React.Key | null) => {
-    const values = String(keys).split(",").filter(Boolean);
-    updateFilters({
-      providers: values.length > 0 ? values.join(",") : null,
-    });
-  };
   return (
-    <div className="flex flex-col gap-4">
-      {/* <div className="w-full">
-        <Input
-          placeholder={`Search ${filters.mediaType === "movie" ? "movies" : "TV shows"}...`}
-          value={searchInput}
-          onChange={(e) => setSearchInput(e.target.value)}
-          endContent={
-            searchInput ? (
-              <Button
-                isIconOnly
-                variant="light"
-                size="sm"
-                onClick={clearSearch}
-              >
-                <XIcon size={16} />
-              </Button>
-            ) : (
-              <SearchIcon size={16} />
-            )
+    <>
+      <div className="flex flex-col gap-4 w-full">
+        <Tabs
+          selectedKey={filters.mediaType}
+          onSelectionChange={(key) =>
+            updateFilters({ mediaType: key as string, genres: null })
           }
-          className="w-full"
+          aria-label="Media type tabs"
+          variant="bordered"
+          className="justify-center sm:justify-start"
+        >
+          <Tab key="movie" title="Movies" />
+          <Tab key="tv" title="TV Shows" />
+        </Tabs>
+        {!searchQuery && (
+          <div className="flex flex-wrap gap-4 items-center">
+            {/* Providers Multi-select */}
+            <Select
+              label="Providers"
+              placeholder="Select providers"
+              selectionMode="multiple"
+              className="sm:max-w-sm"
+              size="md"
+              onChange={(e) => {
+                updateFilters({
+                  providers: e.target.value,
+                });
+              }}
+              labelPlacement={"outside"}
+              selectedKeys={
+                filters.providers ? filters.providers.split(",") : []
+              }
+              startContent={<IconBrandYoutube stroke={2} />}
+            >
+              {watchProviders.map((provider) => (
+                <SelectItem key={provider.value}>{provider.label}</SelectItem>
+              ))}
+            </Select>
+
+            {/* Language Select */}
+            <Autocomplete
+              label="Language"
+              className="sm:max-w-xs"
+              placeholder="Select language"
+              defaultItems={languages}
+              selectedKey={filters.language || ""}
+              onSelectionChange={(key) =>
+                updateFilters({ language: key ? String(key) : null })
+              }
+              size="md"
+              labelPlacement={"outside"}
+              isClearable
+              startContent={<IconLanguage stroke={2} />}
+            >
+              {(language) => (
+                <AutocompleteItem key={language.value}>
+                  {language.label}
+                </AutocompleteItem>
+              )}
+            </Autocomplete>
+
+            {/* Region Select */}
+            <Autocomplete
+              label="Watch Region"
+              className="sm:max-w-xs"
+              placeholder="Select watch region"
+              defaultItems={watchRegions}
+              selectedKey={filters.region || ""}
+              onSelectionChange={(key) =>
+                updateFilters({ region: key ? String(key) : null })
+              }
+              size="md"
+              labelPlacement={"outside"}
+              isClearable={false}
+              startContent={<IconTimezone stroke={2} />}
+            >
+              {(region) => (
+                <AutocompleteItem
+                  key={region.value}
+                  startContent={
+                    <Avatar
+                      alt={region.value}
+                      className="w-6 h-6"
+                      src={`https://flagcdn.com/${region.value.toLowerCase()}.svg`}
+                    />
+                  }
+                >
+                  {region.label}
+                </AutocompleteItem>
+              )}
+            </Autocomplete>
+
+            {/* Genres Multi-select */}
+            <Select
+              label="Genres"
+              placeholder="Select genres"
+              selectionMode="multiple"
+              className="sm:max-w-sm"
+              onChange={(e) => {
+                updateFilters({
+                  genres: e.target.value,
+                });
+              }}
+              size="md"
+              labelPlacement={"outside"}
+              startContent={<IconCategory stroke={2} />}
+              selectedKeys={filters.genres ? filters.genres.split(",") : []}
+            >
+              {(filters.mediaType === "movie" ? movieGenres : tvGenres).map(
+                (genre) => (
+                  <SelectItem key={genre.value}>{genre.label}</SelectItem>
+                )
+              )}
+            </Select>
+
+            {/* Sort By Select */}
+            <Select
+              label="Sort By"
+              placeholder="Sort By"
+              className="sm:max-w-xs"
+              size="md"
+              labelPlacement={"outside"}
+              onChange={(e) =>
+                updateFilters({ sortBy: e.target.value || "popularity.desc" })
+              }
+              selectedKeys={[filters.sortBy || "popularity.desc"]}
+              startContent={<IconArrowsSort stroke={2} />}
+            >
+              {sortOptions.map((option) => (
+                <SelectItem key={option.value}>{option.label}</SelectItem>
+              ))}
+            </Select>
+          </div>
+        )}
+
+        {/* Active filters display */}
+        {/* <div className="text-sm text-gray-500">
+          {filters.query && <span>{filters.query}</span>}
+          {filters.page > 1 && <span> | Page {filters.page}</span>}
+          {filters.mediaType && <span>| {filters.mediaType}</span>}
+          {filters.providers && <span> | Providers: {filters.providers}</span>}
+          {filters.language && <span> | Language: {filters.language}</span>}
+          {filters.region && <span> | Region: {filters.region}</span>}
+          {filters.genres && <span> | Genres: {filters.genres}</span>}
+          {filters.sortBy && <span> | Sort: {filters.sortBy}</span>}
+        </div> */}
+        <MediaGrid
+          filters={filters}
+          searchQuery={searchQuery}
+          onPageChange={(newPage) => updateFilters({ page: newPage })}
         />
-      </div> */}
-
-      <Tabs
-        selectedKey={filters.mediaType}
-        onSelectionChange={(key) => updateFilters({ mediaType: key as string })}
-        fullWidth
-        aria-label="Media type tabs"
-        variant="underlined"
-      >
-        <Tab key="movie" title="Movies" />
-        <Tab key="tv" title="TV Shows" />
-      </Tabs>
-      {!filters.query && (
-        <div className="flex flex-wrap gap-3 items-center">
-          {/* Providers Multi-select */}
-          <Select
-            label="Providers"
-            placeholder="Select providers"
-            selectionMode="multiple"
-            className="max-w-xs"
-            onChange={(e) => {
-              updateFilters({
-                providers: e.target.value,
-              });
-            }}
-            selectedKeys={filters.providers ? filters.providers.split(",") : []}
-          >
-            {watchProviders.map((provider) => (
-              <SelectItem key={provider.value}>{provider.label}</SelectItem>
-            ))}
-          </Select>
-
-          {/* Language Select */}
-          <Autocomplete
-            label="Language"
-            className="max-w-xs"
-            placeholder="Select language"
-            defaultItems={languages}
-            selectedKey={filters.language || ""}
-            onSelectionChange={(key) =>
-              updateFilters({ language: key ? String(key) : null })
-            }
-            isClearable
-          >
-            {(language) => (
-              <AutocompleteItem key={language.value}>
-                {language.label}
-              </AutocompleteItem>
-            )}
-          </Autocomplete>
-
-          {/* Region Select */}
-          <Autocomplete
-            label="Watch Region"
-            className="max-w-xs"
-            placeholder="Select watch region"
-            defaultItems={watchRegions}
-            selectedKey={filters.region || ""}
-            onSelectionChange={(key) =>
-              updateFilters({ region: key ? String(key) : null })
-            }
-            isClearable={false}
-          >
-            {(region) => (
-              <AutocompleteItem
-                key={region.value}
-                startContent={
-                  <Avatar
-                    alt={region.value}
-                    className="w-6 h-6"
-                    src={`https://flagcdn.com/${region.value.toLowerCase()}.svg`}
-                  />
-                }
-              >
-                {region.label}
-              </AutocompleteItem>
-            )}
-          </Autocomplete>
-
-          {/* Genres Multi-select */}
-          {/* <Select
-  label="Genres"
-  placeholder="Select genres"
-  selectionMode="multiple"
-  className="max-w-xs"
-  onChange={(e) => {
-    const values = e.target.value.split(",").filter(Boolean);
-    updateFilters({
-      genres: values.length > 0 ? values.join(",") : null,
-    });
-  }}
-  selectedKeys={filters.genres ? filters.genres.split(",") : []}
->
-  {currentGenres.map((genre) => (
-    <SelectItem key={genre.value} value={genre.value}>
-      {genre.label}
-    </SelectItem>
-  ))}
-</Select> */}
-
-          {/* Sort By Select */}
-          <Select
-            label="Sort By"
-            placeholder="Sort By"
-            className="max-w-xs"
-            onChange={(e) =>
-              updateFilters({ sortBy: e.target.value || "popularity.desc" })
-            }
-            selectedKeys={[filters.sortBy || "popularity.desc"]}
-          >
-            {sortOptions.map((option) => (
-              <SelectItem key={option.value}>{option.label}</SelectItem>
-            ))}
-          </Select>
-        </div>
-      )}
-
-      {/* Active filters display */}
-      <div className="text-sm text-gray-500">
-        {filters.query && <span>{filters.query}</span>}
-        {filters.page > 1 && <span> | Page {filters.page}</span>}
-        {filters.mediaType && <span>| {filters.mediaType}</span>}
-        {filters.providers && <span> | Providers: {filters.providers}</span>}
-        {filters.language && <span> | Language: {filters.language}</span>}
-        {filters.region && <span> | Region: {filters.region}</span>}
-        {filters.genres && <span> | Genres: {filters.genres}</span>}
-        {filters.sortBy && <span> | Sort: {filters.sortBy}</span>}
       </div>
-      <MediaGrid
-        filters={filters}
-        onPageChange={(newPage) => updateFilters({ page: newPage })}
-      />
-    </div>
+    </>
   );
 }

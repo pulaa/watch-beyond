@@ -1,32 +1,29 @@
+"use client";
+
 import {
   Navbar as HeroUINavbar,
   NavbarContent,
-  NavbarMenu,
-  NavbarMenuToggle,
   NavbarBrand,
   NavbarItem,
-  NavbarMenuItem,
 } from "@heroui/navbar";
-import { Button } from "@heroui/button";
-import { Kbd } from "@heroui/kbd";
-import { Link } from "@heroui/link";
 import { Input } from "@heroui/input";
-import { link as linkStyles } from "@heroui/theme";
-import NextLink from "next/link";
-import clsx from "clsx";
-
-
 import { ThemeSwitch } from "@/components/theme-switch";
-import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
-  SearchIcon,
-  Logo,
-} from "@/components/icons";
+import { useSearchStore } from "@/store/use-search-store";
+import { useDebounce } from "@/hooks/use-debounce";
+import { useEffect, useState } from "react";
+import { IconSearch } from "@tabler/icons-react";
 
 export const Navbar = () => {
+  const { searchQuery, setSearchQuery, clearSearch } = useSearchStore();
+
+  const [inputValue, setInputValue] = useState(searchQuery);
+
+  const debouncedValue = useDebounce(inputValue, 1000);
+
+  useEffect(() => {
+    setSearchQuery(debouncedValue);
+  }, [debouncedValue, setSearchQuery]);
+
   const searchInput = (
     <Input
       aria-label="Search"
@@ -34,54 +31,30 @@ export const Navbar = () => {
         inputWrapper: "bg-default-100",
         input: "text-sm",
       }}
-      endContent={
-        <Kbd className="hidden lg:inline-block" keys={["command"]}>
-          K
-        </Kbd>
-      }
       labelPlacement="outside"
       placeholder="Search..."
       startContent={
-        <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
+        <IconSearch stroke={2} />
       }
       type="search"
+      value={inputValue}
+      onChange={(e) => setInputValue(e.target.value)}
     />
   );
 
   return (
-    <HeroUINavbar maxWidth="xl" position="sticky">
-      <NavbarContent className="basis-1/5 sm:basis-full" justify="start">
-        <NavbarBrand as="li" className="gap-3 max-w-fit">
-          <NextLink className="flex justify-start items-center gap-1" href="/">
-            <Logo />
-            <p className="font-bold text-inherit">ACME</p>
-          </NextLink>
-        </NavbarBrand>
-
+    <HeroUINavbar>
+      {/* <NavbarBrand>
+        <p className="font-bold text-inherit">WATCH BEYOND</p>
+      </NavbarBrand> */}
+      <NavbarContent justify="center">
+        <NavbarItem>{searchInput}</NavbarItem>
       </NavbarContent>
-
-      <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
-        justify="end"
-      >
-        <NavbarItem className="hidden sm:flex gap-2">
-
+      <NavbarContent justify="end">
+        <NavbarItem>
           <ThemeSwitch />
         </NavbarItem>
-        <NavbarItem className="hidden lg:flex">{searchInput}</NavbarItem>
-
       </NavbarContent>
-
-      <NavbarContent className="sm:hidden basis-1 pl-4" justify="end">
-
-        <ThemeSwitch />
-        <NavbarMenuToggle />
-      </NavbarContent>
-
-      <NavbarMenu>
-        {searchInput}
-
-      </NavbarMenu>
     </HeroUINavbar>
   );
 };

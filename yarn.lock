@@ -109,6 +109,18 @@
   dependencies:
     tslib "2"
 
+"@heroui/alert@^2.2.16":
+  version "2.2.16"
+  resolved "https://registry.yarnpkg.com/@heroui/alert/-/alert-2.2.16.tgz#69cd5306de31f90d50f6a32554ed940d07a06699"
+  integrity sha512-cqB6m1U8urTH8ZzGqOUTOEYRWpFawk2OLDoKXCPQD+YeBRhwl0rOxVmfTnZG+xAQAIj4T7ao0KgwdS5DuVbnrA==
+  dependencies:
+    "@heroui/button" "2.2.16"
+    "@heroui/react-utils" "2.1.8"
+    "@heroui/shared-icons" "2.1.6"
+    "@heroui/shared-utils" "2.1.7"
+    "@react-aria/utils" "3.28.0"
+    "@react-stately/utils" "3.10.5"
+
 "@heroui/aria-utils@2.2.13":
   version "2.2.13"
   resolved "https://registry.yarnpkg.com/@heroui/aria-utils/-/aria-utils-2.2.13.tgz#2aae607535303cd2a84bb094d267407573f6ac6c"
@@ -391,7 +403,7 @@
     "@react-stately/overlays" "3.6.14"
     "@react-types/overlays" "3.8.13"
 
-"@heroui/navbar@2.2.14":
+"@heroui/navbar@^2.2.14":
   version "2.2.14"
   resolved "https://registry.yarnpkg.com/@heroui/navbar/-/navbar-2.2.14.tgz#e0d8572266c6f974136ab5da0f5de6d289bc2305"
   integrity sha512-e18GHX1cgOLWZ1LhCxcM8EFRfwrWDCVS1GS/Y28qQskTDL0EsqMmdGHeEDwSrg0diCoPQrh6vnUh+9UlWd1l1g==
@@ -514,6 +526,14 @@
   resolved "https://registry.yarnpkg.com/@heroui/shared-utils/-/shared-utils-2.1.7.tgz#7213ac10e9acb5b83ba7c9ad50f1a4aaa3df2e12"
   integrity sha512-1nx7y41P+Bsca7nDC+QFajAoFhSRGvjKhdFeopMQNTvU95L42PD7B0ThjcOretvQD0Ye2TsAEQInwsSgZ6kK/g==
 
+"@heroui/skeleton@^2.2.10":
+  version "2.2.10"
+  resolved "https://registry.yarnpkg.com/@heroui/skeleton/-/skeleton-2.2.10.tgz#651fc96acb8822cc3b1f13f1ba12a502784b1c6c"
+  integrity sha512-6nv+Efzi3DBrVCVTY1CC8InaiYdmztPjmw/ytjGEm1rJNpJCK9HOgKSUVuz6dncLsIsB77toMfE+2s53Yrq9Yg==
+  dependencies:
+    "@heroui/react-utils" "2.1.8"
+    "@heroui/shared-utils" "2.1.7"
+
 "@heroui/snippet@2.2.17":
   version "2.2.17"
   resolved "https://registry.yarnpkg.com/@heroui/snippet/-/snippet-2.2.17.tgz#e20947ac925e0e4714c43d7e827fe6d13e3803c1"
@@ -528,7 +548,7 @@
     "@react-aria/focus" "3.20.0"
     "@react-aria/utils" "3.28.0"
 
-"@heroui/spinner@2.2.13":
+"@heroui/spinner@2.2.13", "@heroui/spinner@^2.2.13":
   version "2.2.13"
   resolved "https://registry.yarnpkg.com/@heroui/spinner/-/spinner-2.2.13.tgz#1c73434c3abb2b6718605140a3c4e580ffaccc45"
   integrity sha512-tTnbyxtee7wRs61l7uCM2qjNcLHkUoyToRa+a8LLEak3w6mnbMk59pQOETgXZ4aoozpzJF+uzdhqrK82EKcqCQ==
@@ -5003,3 +5023,8 @@ yocto-queue@^0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/yocto-queue/-/yocto-queue-0.1.0.tgz#0294eb3dee05028d31ee1a5fa2c556a6aaf10a1b"
   integrity sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==
+
+zustand@^5.0.3:
+  version "5.0.3"
+  resolved "https://registry.yarnpkg.com/zustand/-/zustand-5.0.3.tgz#b323435b73d06b2512e93c77239634374b0e407f"
+  integrity sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==

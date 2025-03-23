@@ -1,5 +1,4 @@
 "use client";
-import NextImage from "next/image";
 
 import { discoverMedia, searchMedia } from "@/actions/movie-actions";
 import { MediaFilters } from "@/types";
@@ -8,8 +7,10 @@ import { Pagination } from "@heroui/pagination";
 import { useEffect, useState } from "react";
 import { Image } from "@heroui/image";
 import { Chip } from "@heroui/chip";
-import { IconCalendarMonth, IconStar } from "@tabler/icons-react";
+import { IconStar } from "@tabler/icons-react";
 import MediaDetailModal from "./media-detail-modal";
+import { Spinner } from "@heroui/spinner";
+import { Alert } from "@heroui/alert";
 
 interface Movie {
   id: number;
@@ -24,11 +25,13 @@ interface Movie {
 interface MediaGridProps {
   onPageChange: (page: number) => void;
   filters: MediaFilters;
+  searchQuery?: string;
 }
 
 export default function MediaGridGrid({
   onPageChange,
   filters,
+  searchQuery,
 }: MediaGridProps) {
   const [results, setResults] = useState<Movie[]>([]);
   const [error, setError] = useState<string | null>(null);
@@ -39,16 +42,8 @@ export default function MediaGridGrid({
     type: "movie" | "tv";
   } | null>(null);
 
-  const {
-    mediaType,
-    providers,
-    language,
-    region,
-    page,
-    query,
-    genres,
-    sortBy,
-  } = filters;
+  const { mediaType, providers, language, region, page, genres, sortBy } =
+    filters;
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,12 +53,12 @@ export default function MediaGridGrid({
       try {
         let data;
 
-        if (query) {
-          data = await searchMedia(query, mediaType, page);
+        if (searchQuery) {
+          data = await searchMedia(searchQuery, mediaType, page);
         } else {
           data = await discoverMedia(filters);
         }
-        //  await new Promise((resolve) => setTimeout(resolve, 500))
+        await new Promise((resolve) => setTimeout(resolve, 1000));
 
         setResults(data.results);
         setTotalPages(data.total_pages);
@@ -76,19 +71,29 @@ export default function MediaGridGrid({
     };
 
     fetchData();
-  }, [mediaType, providers, language, region, page, query, genres, sortBy]);
+  }, [
+    mediaType,
+    providers,
+    language,
+    region,
+    page,
+    searchQuery,
+    genres,
+    sortBy,
+  ]);
 
   if (error) {
     return (
-      // <Alert color="red" title="Error" icon={<IconAlertCircle size={16} />}>
-      //   {error}
-      // </Alert>
-      <span className="block text-center text-red-500">{error}</span>
+      <div className="flex flex-col items-center justify-center py-12 gap-4">
+        <Alert color="danger" title="Error">
+          {error}
+        </Alert>
+      </div>
     );
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full mt-4">
       {/* <Text size="xl" fw={600} mb="md">
         {searchQuery
           ? `Search results for "${searchQuery}"`
@@ -97,11 +102,13 @@ export default function MediaGridGrid({
 
       {loading ? (
         <>
-          <span className="block text-center text-default-500">Loading...</span>
+          <div className="flex flex-col items-center justify-center py-12 gap-4">
+            <Spinner variant="wave" />
+          </div>
         </>
       ) : results.length > 0 ? (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-4">
             {results.map((item) => (
               <Card
                 className="max-w-sm"
@@ -112,6 +119,7 @@ export default function MediaGridGrid({
                     type: mediaType as "movie" | "tv",
                   })
                 }
+                shadow="lg"
                 key={item.id}
               >
                 <CardBody className="p-0 overflow-hidden">
@@ -123,10 +131,16 @@ export default function MediaGridGrid({
                       radius="none"
                     />
                     <Chip
-                      startContent={<IconStar stroke={2} size={20} className="text-yellow-400" />}
-                      className="absolute top-2 right-2 bg-black/50 border-none z-10 p-2.5"
+                      startContent={
+                        <IconStar
+                          stroke={2}
+                          size={18}
+                          className="text-yellow-400"
+                        />
+                      }
+                      className="absolute top-2 right-2  z-10"
                       color="default"
-                      variant="bordered"
+                      variant="flat"
                       size="sm"
                     >
                       <span className="text-sm text-white">
@@ -135,16 +149,14 @@ export default function MediaGridGrid({
                     </Chip>
                   </div>
                 </CardBody>
-                <CardFooter className="flex flex-col items-start">
-                  <h3 className="font-bold">
-                    {item.title || item.name}
-                  </h3>
+                {/* <CardFooter className="flex flex-col items-start">
+                  <p className="font-bold">{item.title || item.name}</p>
                   <div className="flex items-center mt-1 text-sm text-default-500">
                     {item.release_date?.substring(0, 4) ||
                       item.first_air_date?.substring(0, 4) ||
                       "N/A"}
                   </div>
-                </CardFooter>
+                </CardFooter> */}
               </Card>
             ))}
           </div>
@@ -161,15 +173,11 @@ export default function MediaGridGrid({
         </>
       ) : (
         <div className="flex flex-col items-center justify-center py-12 gap-4">
-          {/* <Icon 
-            icon="lucide:search" 
-            className="w-12 h-12 text-default-400"
-          /> */}
-          <p className="text-default-500">
-            {query
-              ? `No results found for "${query}". Try a different search term.`
+          <Alert color="default">
+            {searchQuery
+              ? `No results found for "${searchQuery}". Try a different search term.`
               : "No results found. Try different filters."}
-          </p>
+          </Alert>
         </div>
       )}
 
