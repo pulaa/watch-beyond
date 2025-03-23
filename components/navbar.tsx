@@ -27,10 +27,11 @@ export const Navbar = () => {
   const searchInput = (
     <Input
       aria-label="Search"
-      classNames={{
-        inputWrapper: "bg-default-100",
-        input: "text-sm",
-      }}
+      // classNames={{
+      //   inputWrapper: "bg-default-100",
+      //   input: "text-sm",
+      // }}
+      fullWidth
       labelPlacement="outside"
       placeholder="Search..."
       startContent={
@@ -39,6 +40,10 @@ export const Navbar = () => {
       type="search"
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}
+      onClear={() => {
+        setInputValue("");
+        clearSearch();
+      }}
     />
   );
 
@@ -50,11 +55,11 @@ export const Navbar = () => {
       <NavbarContent justify="center">
         <NavbarItem>{searchInput}</NavbarItem>
       </NavbarContent>
-      <NavbarContent justify="end">
+      {/* <NavbarContent justify="end">
         <NavbarItem>
           <ThemeSwitch />
         </NavbarItem>
-      </NavbarContent>
+      </NavbarContent> */}
     </HeroUINavbar>
   );
 };

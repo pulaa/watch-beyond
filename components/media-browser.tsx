@@ -80,6 +80,7 @@ export default function MediaBrowser() {
           }
           aria-label="Media type tabs"
           variant="bordered"
+          size="lg"
           className="justify-center sm:justify-start"
         >
           <Tab key="movie" title="Movies" />
@@ -93,7 +94,7 @@ export default function MediaBrowser() {
               placeholder="Select providers"
               selectionMode="multiple"
               className="sm:max-w-sm"
-              size="md"
+              size="lg"
               onChange={(e) => {
                 updateFilters({
                   providers: e.target.value,
@@ -120,7 +121,7 @@ export default function MediaBrowser() {
               onSelectionChange={(key) =>
                 updateFilters({ language: key ? String(key) : null })
               }
-              size="md"
+              size="lg"
               labelPlacement={"outside"}
               isClearable
               startContent={<IconLanguage stroke={2} />}
@@ -142,7 +143,7 @@ export default function MediaBrowser() {
               onSelectionChange={(key) =>
                 updateFilters({ region: key ? String(key) : null })
               }
-              size="md"
+              size="lg"
               labelPlacement={"outside"}
               isClearable={false}
               startContent={<IconTimezone stroke={2} />}
@@ -174,7 +175,7 @@ export default function MediaBrowser() {
                   genres: e.target.value,
                 });
               }}
-              size="md"
+              size="lg"
               labelPlacement={"outside"}
               startContent={<IconCategory stroke={2} />}
               selectedKeys={filters.genres ? filters.genres.split(",") : []}
@@ -191,7 +192,7 @@ export default function MediaBrowser() {
               label="Sort By"
               placeholder="Sort By"
               className="sm:max-w-xs"
-              size="md"
+              size="lg"
               labelPlacement={"outside"}
               onChange={(e) =>
                 updateFilters({ sortBy: e.target.value || "popularity.desc" })
