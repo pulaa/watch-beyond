@@ -59,22 +59,14 @@ export default function MediaDetailModal({
       onClose={onClose}
       size="5xl"
       scrollBehavior="outside"
-      // classNames={{
-      //   base: "bg-gradient-to-t from-black via-black/40 to-black/30",
-      // }}
+      classNames={{
+        header: details.backdrop_path 
+          ? `bg-[url(https://image.tmdb.org/t/p/w1280${details.backdrop_path})]`
+          : "bg-gray-900",
+      }}
     >
       <ModalContent>
-        <ModalHeader className="flex flex-col gap-1 pt-16 relative -z-10">
-          {details.backdrop_path && (
-            <div className="absolute inset-0 w-full rounded-t-lg overflow-hidden">
-              <Image
-                src={`https://image.tmdb.org/t/p/w1280${details.backdrop_path}`}
-                alt={mediaType === "movie" ? details.title : details.name}
-                className="object-cover w-full h-full"
-              />
-              {/* <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/60 to-black/90"></div> */}
-            </div>
-          )}
+        <ModalHeader className="flex flex-col gap-1 pt-8 sm:pt-16 relative -z-10" >
 
           <div className="relative z-10 flex flex-col sm:flex-row gap-6">
             {/* Poster */}
@@ -91,7 +83,7 @@ export default function MediaDetailModal({
             </div>
 
             {/* details Info */}
-            <div className="flex-grow">
+            <div className="flex-grow ">
               <h2 className="text-2xl sm:text-3xl font-bold text-white">
                 {mediaType === "movie" ? details.title : details.name}
               </h2>
@@ -104,34 +96,40 @@ export default function MediaDetailModal({
                 ))}
               </div>
 
-              <div className="flex flex-wrap gap-4 mt-4 text-sm text-white/80">
+              <div className="flex flex-wrap gap-4 mt-4 text-sm">
                 {details.release_date && (
-                  <div className="flex items-center">
-                    <IconCalendarWeek stroke={2} />
-                    <span>
-                      {new Date(details.release_date).toLocaleDateString()}
-                    </span>
-                  </div>
+                  <Chip
+                    startContent={<IconCalendarWeek stroke={2} />}
+                    variant="flat"
+                    radius="sm"
+                  >
+                    {new Date(details.release_date).toLocaleDateString()}
+                  </Chip>
                 )}
                 {details.runtime && (
-                  <div className="flex items-center">
-                    <IconClock stroke={2} />
-                    <span>{formatRuntime(details.runtime)}</span>
-                  </div>
+                  <Chip
+                    startContent={<IconClock stroke={2} />}
+                    variant="flat"
+                    radius="sm"
+                  >
+                    {formatRuntime(details.runtime)}
+                  </Chip>
                 )}
-                <div className="flex items-center">
-                  <IconStar stroke={2} />
-                  <span>{details.vote_average.toFixed(1)}</span>
-                </div>
+                <Chip
+                  startContent={<IconStar stroke={2} />}
+                  variant="flat"
+                  radius="sm"
+                >
+                  {details.vote_average.toFixed(1)}
+                </Chip>
               </div>
 
-              <p className="mt-4 text-white/70 line-clamp-4 sm:line-clamp-none">
+              <p className="text-md sm:text-lg font-medium mt-4 backdrop-blur-md sm:bg-white/10  rounded-lg shadow-l p-2">
                 {details.overview}
               </p>
             </div>
           </div>
         </ModalHeader>
-
         <ModalBody>
           <WatchProviders providers={details?.["watch/providers"]} />
         </ModalBody>
