@@ -164,7 +164,7 @@ export default function MediaGridGrid({
             ))}
           </div>
           {totalPages > 1 && (
-            <div className="flex justify-center mt-8">
+            <div className="flex justify-center mt-16">
               <Pagination
                 total={totalPages}
                 page={page}
