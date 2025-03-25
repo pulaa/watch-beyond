@@ -8,6 +8,7 @@ import { fontSans } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
 import { SiteFooter } from "@/components/site-footer";
 import { HeroHighlightSection } from "@/components/hero";
+import { Analytics } from "@vercel/analytics/react"
 
 export const viewport: Viewport = {
   themeColor: [
@@ -125,6 +126,7 @@ export default function RootLayout({
             <SiteFooter className="px-6 bg-zinc-900" />
           </div>
         </Providers>
+        <Analytics />
       </body>
     </html>
   );
