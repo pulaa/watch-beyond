@@ -80,7 +80,7 @@ export default function MediaBrowser() {
   );
   return (
     <section
-      className="flex flex-col items-center justify-center gap-4 py-6 md:py-10"
+      className="flex flex-col items-center justify-center gap-4 pb-6 md:pb-10"
       id="home"
     >
       <div className="flex flex-col gap-6 w-full" id="media-browser">

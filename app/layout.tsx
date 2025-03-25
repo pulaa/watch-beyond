@@ -119,11 +119,10 @@ export default function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <HeroHighlightSection />
           <div className="relative flex flex-col h-screen">
-            <Navbar />
             <main className="container mx-auto px-6 flex-grow ">
               {children}
             </main>
-            <SiteFooter className="px-6 bg-zinc-900" />
+            <SiteFooter className="px-6 bg-slate-900" />
           </div>
         </Providers>
         <Analytics />

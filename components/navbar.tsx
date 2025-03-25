@@ -48,11 +48,11 @@ export const Navbar = () => {
   return (
     <HeroUINavbar
       classNames={{
-        // base: "max-w-sm  mx-auto rounded-lg my-4 rounded-lg ",
-        // wrapper: "",
+        wrapper: "bg-transparent",
+        base: "mt-4 bg-transparent",
       }}
     >
-      <NavbarContent justify="center" className="mx-auto"> 
+      <NavbarContent justify="center" className="mx-auto">
         <NavbarItem>{searchInput}</NavbarItem>
       </NavbarContent>
       {/* <NavbarContent justify="end">
