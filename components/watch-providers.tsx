@@ -6,7 +6,7 @@ import { Card, CardBody, CardFooter, CardHeader } from "@heroui/card";
 import { Chip } from "@heroui/chip";
 import { ScrollShadow } from "@heroui/scroll-shadow";
 import { Tab, Tabs } from "@heroui/tabs";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 // Render a provider card with consistent styling
 const renderProviderCard = (provider: any) => (
@@ -97,9 +97,12 @@ export default function WatchProviders({ providers }: any) {
     );
   };
 
-  const flatrateProviders = getProvidersForType("flatrate");
-  const rentProviders = getProvidersForType("rent");
-  const buyProviders = getProvidersForType("buy");
+  const flatrateProviders = useMemo(
+    () => getProvidersForType("flatrate"),
+    [providers]
+  );
+  const rentProviders = useMemo(() => getProvidersForType("rent"), [providers]);
+  const buyProviders = useMemo(() => getProvidersForType("buy"), [providers]);
 
   return (
     <Tabs
@@ -122,7 +125,7 @@ export default function WatchProviders({ providers }: any) {
       >
         <>
           {flatrateProviders.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
               {flatrateProviders.map(renderProviderCard)}
             </div>
           ) : (
@@ -182,7 +185,7 @@ export default function WatchProviders({ providers }: any) {
           ) : (
             <div className="p-6 text-center bg-gray-50 rounded-lg">
               <p className="text-gray-500">
-                No purchase options available for this ti  tle
+                No purchase options available for this title
               </p>
             </div>
           )}

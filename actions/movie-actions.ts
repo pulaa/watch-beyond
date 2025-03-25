@@ -160,7 +160,7 @@ export async function discoverMedia(
       Authorization: `Bearer ${TMDB_TOKEN}`,
       "Content-Type": "application/json",
     },
-    next: { revalidate: 3600 }, // Cache for 1 hour
+    next: { revalidate: 86400 }, // Cache for 1 day
   });
 
   if (!response.ok) {
@@ -193,7 +193,7 @@ export async function searchMedia(
         Authorization: `Bearer ${TMDB_TOKEN}`,
         "Content-Type": "application/json",
       },
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      next: { revalidate: 86400 }, // Cache for 1 day
     }
   );
 
@@ -221,7 +221,7 @@ export async function getMediaDetails(
         Authorization: `Bearer ${TMDB_TOKEN}`,
         "Content-Type": "application/json",
       },
-      next: { revalidate: 3600 }, // Cache for 1 hour
+      next: { revalidate: 86400 }, // Cache for 1 day
     }
   );
 

@@ -2,7 +2,7 @@
 
 import { MediaFilters } from "@/types";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { Tabs, Tab } from "@heroui/tabs";
 import { Divider } from "@heroui/divider";
 import { watchProviders } from "@/data/watchProviders";
@@ -19,7 +19,16 @@ import MediaGrid from "./media-grid";
 import { movieGenres } from "@/data/movieGenres";
 import { tvGenres } from "@/data/tvGenres";
 import { useSearchStore } from "@/store/use-search-store";
-import { IconArrowsSort, IconBrandYoutube, IconCategory, IconLanguage, IconTimezone } from "@tabler/icons-react";
+import {
+  IconArrowsSort,
+  IconBrandYoutube,
+  IconCategory,
+  IconEye,
+  IconEyeOff,
+  IconLanguage,
+  IconTimezone,
+} from "@tabler/icons-react";
+import { Switch } from "@heroui/switch";
 const sortOptions = [
   { value: "popularity.desc", label: "Popularity (High to Low)" },
   { value: "popularity.asc", label: "Popularity (Low to High)" },
@@ -36,7 +45,7 @@ export default function MediaBrowser() {
 
   const searchParams = useSearchParams();
   const router = useRouter();
-
+  const [hideFilters, setHideFilters] = useState(false);
   // Create a single filters object from URL params or defaults
   const [filters, setFilters] = useState<MediaFilters>({
     mediaType: searchParams.get("mediaType") || "movie",
@@ -50,50 +59,69 @@ export default function MediaBrowser() {
   });
 
   // Update filters and URL
-  const updateFilters = (updates: Partial<MediaFilters>) => {
-    const params = new URLSearchParams(searchParams);
+  const updateFilters = useCallback(
+    (updates: Partial<MediaFilters>) => {
+      // Create new params from current search params
+      const params = new URLSearchParams(searchParams.toString());
 
-    // Update URL params based on filter changes
-    Object.entries(updates).forEach(([key, value]) => {
-      console.log(key, value);
-      if (!value) {
-        params.delete(key);
-      } else if (value) {
-        params.set(key, value.toString());
-      }
-    });
+      // Process all updates
+      Object.entries(updates).forEach(([key, value]) => {
+        // Remove param if value is falsy, otherwise set it
+        value ? params.set(key, String(value)) : params.delete(key);
+      });
 
-    // Update URL
-    router.push(`?${params.toString()}`);
+      // Update URL without full page reload
+      router.push(`?${params.toString()}`, { scroll: false });
 
-    // Update state
-    setFilters((prev) => ({ ...prev, ...updates }));
-  };
-
+      // Update local state
+      setFilters((prev) => ({ ...prev, ...updates }));
+    },
+    [router, searchParams, setFilters]
+  );
   return (
-    <>
-      <div className="flex flex-col gap-4 w-full">
+    <section
+      className="flex flex-col items-center justify-center gap-4 py-6 md:py-10"
+      id="home"
+    >
+      <div className="flex flex-col gap-6 w-full" id="media-browser">
         <Tabs
           selectedKey={filters.mediaType}
           onSelectionChange={(key) =>
             updateFilters({ mediaType: key as string, genres: null })
           }
+          color={"primary"}
           aria-label="Media type tabs"
           variant="bordered"
           size="lg"
-          className="justify-center sm:justify-start"
+          className="justify-center 2xl:justify-start"
         >
           <Tab key="movie" title="Movies" />
           <Tab key="tv" title="TV Shows" />
         </Tabs>
         {!searchQuery && (
-          <div className="flex flex-wrap gap-4 items-center">
+          <Switch
+            defaultSelected
+            size="lg"
+            onValueChange={(value) => {
+              setHideFilters(!value);
+            }}
+            thumbIcon={({ isSelected, className }) =>
+              isSelected ? (
+                <IconEyeOff stroke={2} className={className} />
+              ) : (
+                <IconEye stroke={2} className={className} />
+              )
+            }
+          />
+        )}
+
+        {!searchQuery && !hideFilters && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             {/* Providers Multi-select */}
             <Select
               label="Providers"
               placeholder="Select providers"
               selectionMode="multiple"
-              className="sm:max-w-sm"
               size="lg"
               onChange={(e) => {
                 updateFilters({
@@ -114,16 +142,15 @@ export default function MediaBrowser() {
             {/* Language Select */}
             <Autocomplete
               label="Language"
-              className="sm:max-w-xs"
               placeholder="Select language"
               defaultItems={languages}
               selectedKey={filters.language || ""}
               onSelectionChange={(key) =>
-                updateFilters({ language: key ? String(key) : null })
+                updateFilters({ language: key ? String(key) : "" })
               }
               size="lg"
               labelPlacement={"outside"}
-              isClearable
+              isClearable={false}
               startContent={<IconLanguage stroke={2} />}
             >
               {(language) => (
@@ -136,7 +163,6 @@ export default function MediaBrowser() {
             {/* Region Select */}
             <Autocomplete
               label="Watch Region"
-              className="sm:max-w-xs"
               placeholder="Select watch region"
               defaultItems={watchRegions}
               selectedKey={filters.region || ""}
@@ -169,7 +195,6 @@ export default function MediaBrowser() {
               label="Genres"
               placeholder="Select genres"
               selectionMode="multiple"
-              className="sm:max-w-sm"
               onChange={(e) => {
                 updateFilters({
                   genres: e.target.value,
@@ -191,7 +216,6 @@ export default function MediaBrowser() {
             <Select
               label="Sort By"
               placeholder="Sort By"
-              className="sm:max-w-xs"
               size="lg"
               labelPlacement={"outside"}
               onChange={(e) =>
@@ -224,6 +248,6 @@ export default function MediaBrowser() {
           onPageChange={(newPage) => updateFilters({ page: newPage })}
         />
       </div>
-    </>
+    </section>
   );
 }

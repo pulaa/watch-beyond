@@ -34,9 +34,7 @@ export const Navbar = () => {
       fullWidth
       labelPlacement="outside"
       placeholder="Search..."
-      startContent={
-        <IconSearch stroke={2} />
-      }
+      startContent={<IconSearch stroke={2} />}
       type="search"
       value={inputValue}
       onChange={(e) => setInputValue(e.target.value)}
@@ -48,11 +46,13 @@ export const Navbar = () => {
   );
 
   return (
-    <HeroUINavbar>
-      {/* <NavbarBrand>
-        <p className="font-bold text-inherit">WATCH BEYOND</p>
-      </NavbarBrand> */}
-      <NavbarContent justify="center">
+    <HeroUINavbar
+      classNames={{
+        // base: "max-w-sm  mx-auto rounded-lg my-4 rounded-lg ",
+        // wrapper: "",
+      }}
+    >
+      <NavbarContent justify="center" className="mx-auto"> 
         <NavbarItem>{searchInput}</NavbarItem>
       </NavbarContent>
       {/* <NavbarContent justify="end">

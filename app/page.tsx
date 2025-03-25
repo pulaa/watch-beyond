@@ -1,5 +1,5 @@
-import MediaBrowser from "@/components/media-browser";
 
+import MediaBrowser from "@/components/media-browser";
 
 export const dynamic = "force-dynamic";
 
@@ -53,8 +53,9 @@ export const dynamic = "force-dynamic";
 
 export default function Home() {
   return (
-    <section className="flex flex-col items-center justify-center gap-4 py-8 md:py-10">
+    <>
+
       <MediaBrowser />
-    </section>
+    </>
   );
 }

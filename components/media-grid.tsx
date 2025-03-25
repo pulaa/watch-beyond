@@ -11,6 +11,7 @@ import { IconStar } from "@tabler/icons-react";
 import MediaDetailModal from "./media-detail-modal";
 import { Spinner } from "@heroui/spinner";
 import { Alert } from "@heroui/alert";
+import MediaDetailModal2 from "./media-detail-modal-2";
 
 interface Movie {
   id: number;
@@ -58,7 +59,7 @@ export default function MediaGridGrid({
         } else {
           data = await discoverMedia(filters);
         }
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // await new Promise((resolve) => setTimeout(resolve, 100000));
 
         setResults(data.results);
         setTotalPages(data.total_pages);
@@ -84,10 +85,12 @@ export default function MediaGridGrid({
 
   if (error) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 gap-4">
-        <Alert color="danger" title="Error">
-          {error}
-        </Alert>
+      <div className="flex flex-col items-center justify-center py-12 gap-4 min-h-screen">
+        <div className="mb-auto">
+          <Alert color="danger" title="Error" className="mb-auto ">
+            {error}
+          </Alert>
+        </div>
       </div>
     );
   }
@@ -102,13 +105,13 @@ export default function MediaGridGrid({
 
       {loading ? (
         <>
-          <div className="flex flex-col items-center justify-center py-12 gap-4">
-            <Spinner variant="wave" />
+          <div className="flex flex-col items-center justify-center py-12 gap-4 min-h-screen">
+            <Spinner variant="wave" className="mb-auto" />
           </div>
         </>
       ) : results.length > 0 ? (
-        <>
-          <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-8 gap-4">
+        <div className="min-h-screen" id="media-grid">
+          <div className="grid grid-cols-2 sm:grid-cols-5  gap-4">
             {results.map((item) => (
               <Card
                 className="max-w-sm"
@@ -160,29 +163,38 @@ export default function MediaGridGrid({
               </Card>
             ))}
           </div>
-
-          <div className="flex justify-center mt-8">
-            <Pagination
-              total={totalPages}
-              page={page}
-              onChange={onPageChange}
-              showControls
-              color="primary"
-            />
-          </div>
-        </>
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-8">
+              <Pagination
+                total={totalPages}
+                page={page}
+                onChange={(newPage) => {
+                  onPageChange(newPage);
+                  document.getElementById('home')?.scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                  });
+                }}
+                showControls
+                color="primary"
+              />
+            </div>
+          )}
+        </div>
       ) : (
-        <div className="flex flex-col items-center justify-center py-12 gap-4">
-          <Alert color="default">
-            {searchQuery
-              ? `No results found for "${searchQuery}". Try a different search term.`
-              : "No results found. Try different filters."}
-          </Alert>
+        <div className="flex flex-col items-center justify-center py-12 gap-4 min-h-screen">
+          <div className="mb-auto">
+            <Alert color="default">
+              {searchQuery
+                ? `No results found for "${searchQuery}". Try a different search term.`
+                : "No results found. Try different filters."}
+            </Alert>
+          </div>
         </div>
       )}
 
       {selectedMedia && (
-        <MediaDetailModal
+        <MediaDetailModal2
           mediaType={selectedMedia.type}
           mediaId={selectedMedia.id}
           isOpen={!!selectedMedia}
