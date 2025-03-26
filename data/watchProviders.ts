@@ -1,4 +1,4 @@
-export const mostUsedWatchProviders = [
+export const watchProviders = [
   { label: "Disney Plus", value: "337" },
   { label: "Netflix", value: "8" },
   { label: "Hulu", value: "15" },
