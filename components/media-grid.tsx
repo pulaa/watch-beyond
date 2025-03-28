@@ -166,7 +166,7 @@ export default function MediaGridGrid({
           {totalPages > 1 && (
             <div className="flex justify-center mt-16">
               <Pagination
-                total={totalPages}
+                total={Math.min(totalPages, 500)}
                 page={page}
                 onChange={(newPage) => {
                   onPageChange(newPage);
