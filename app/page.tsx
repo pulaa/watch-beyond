@@ -1,4 +1,3 @@
-
 import MediaBrowser from "@/components/media-browser";
 
 export const dynamic = "force-dynamic";
@@ -52,10 +51,5 @@ export const dynamic = "force-dynamic";
 // }
 
 export default function Home() {
-  return (
-    <>
-
-      <MediaBrowser />
-    </>
-  );
+  return <MediaBrowser />;
 }

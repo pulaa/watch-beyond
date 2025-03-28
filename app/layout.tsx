@@ -8,7 +8,8 @@ import { fontSans } from "@/config/fonts";
 import { Navbar } from "@/components/navbar";
 import { SiteFooter } from "@/components/site-footer";
 import { HeroHighlightSection } from "@/components/hero";
-import { Analytics } from "@vercel/analytics/react"
+import { Analytics } from "@vercel/analytics/react";
+import { AuroraBackground } from "@/components/aurora-background";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -117,13 +118,13 @@ export default function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <HeroHighlightSection />
-          <div className="relative flex flex-col h-screen">
+          <AuroraBackground>
+            <HeroHighlightSection />
             <main className="container mx-auto px-6 flex-grow ">
               {children}
             </main>
-            <SiteFooter className="px-6 bg-slate-900" />
-          </div>
+          </AuroraBackground>
+          <SiteFooter className="px-6 bg-slate-900 " />
         </Providers>
         <Analytics />
       </body>
