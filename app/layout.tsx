@@ -5,11 +5,9 @@ import clsx from "clsx";
 import { Providers } from "./providers";
 
 import { fontSans } from "@/config/fonts";
-import { Navbar } from "@/components/navbar";
 import { SiteFooter } from "@/components/site-footer";
 import { HeroHighlightSection } from "@/components/hero";
 import { Analytics } from "@vercel/analytics/react";
-import { AuroraBackground } from "@/components/aurora-background";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -118,12 +116,10 @@ export default function RootLayout({
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
-          <AuroraBackground>
-            <HeroHighlightSection />
-            <main className="container mx-auto px-6 flex-grow ">
-              {children}
-            </main>
-          </AuroraBackground>
+          {/* <ReactQueryDevtools initialIsOpen={false} /> */}
+          <HeroHighlightSection />
+          <main className="container mx-auto px-6 flex-grow ">{children}</main>
+
           <SiteFooter className="px-6 bg-slate-900 " />
         </Providers>
         <Analytics />

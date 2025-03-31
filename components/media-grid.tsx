@@ -2,16 +2,15 @@
 
 import { discoverMedia, searchMedia } from "@/actions/movie-actions";
 import { MediaFilters } from "@/types";
-import { Card, CardBody, CardFooter } from "@heroui/card";
-import { Pagination } from "@heroui/pagination";
-import { useEffect, useState } from "react";
+import { Card, CardBody } from "@heroui/card";
+import { useEffect, useRef, useCallback, useState } from "react";
 import { Image } from "@heroui/image";
 import { Chip } from "@heroui/chip";
 import { IconStar } from "@tabler/icons-react";
-import MediaDetailModal from "./media-detail-modal";
 import { Spinner } from "@heroui/spinner";
 import { Alert } from "@heroui/alert";
 import MediaDetailModal2 from "./media-detail-modal-2";
+import { useInfiniteQuery } from "@tanstack/react-query";
 
 interface Movie {
   id: number;
@@ -24,71 +23,88 @@ interface Movie {
 }
 
 interface MediaGridProps {
-  onPageChange: (page: number) => void;
   filters: MediaFilters;
   searchQuery?: string;
 }
 
 export default function MediaGridGrid({
-  onPageChange,
   filters,
   searchQuery,
 }: MediaGridProps) {
-  const [results, setResults] = useState<Movie[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [totalPages, setTotalPages] = useState(1);
   const [selectedMedia, setSelectedMedia] = useState<{
     id: number;
     type: "movie" | "tv";
   } | null>(null);
 
-  const { mediaType, providers, language, region, page, genres, sortBy } =
-    filters;
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isError,
+    error,
+  } = useInfiniteQuery({
+    queryKey: searchQuery
+      ? ["Search", searchQuery, filters.mediaType]
+      : ["Media", filters],
+    queryFn: ({ pageParam = 1 }) => {
+      if (searchQuery) {
+        return searchMedia(searchQuery, filters.mediaType, pageParam);
+      } else {
+        return discoverMedia({ ...filters, page: pageParam });
+      }
+    },
+    getNextPageParam: (lastPage) => {
+      if (lastPage.page < Math.min(lastPage.total_pages, 500)) {
+        return lastPage.page + 1;
+      }
+      return undefined;
+    },
+    initialPageParam: 1,
+  });
+
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [entry] = entries;
+      if (entry.isIntersecting && hasNextPage && !isFetchingNextPage) {
+        fetchNextPage();
+      }
+    },
+    [fetchNextPage, hasNextPage, isFetchingNextPage]
+  );
 
   useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      setError(null);
+    if (observerRef.current) {
+      observerRef.current.disconnect();
+    }
 
-      try {
-        let data;
+    observerRef.current = new IntersectionObserver(handleObserver, {
+      rootMargin: "100px",
+    });
 
-        if (searchQuery) {
-          data = await searchMedia(searchQuery, mediaType, page);
-        } else {
-          data = await discoverMedia(filters);
-        }
-        // await new Promise((resolve) => setTimeout(resolve, 100000));
+    if (loadMoreRef.current) {
+      observerRef.current.observe(loadMoreRef.current);
+    }
 
-        setResults(data.results);
-        setTotalPages(data.total_pages);
-      } catch (err) {
-        setError("Error loading content. Please try again later.");
-        console.error(err);
-      } finally {
-        setLoading(false);
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
       }
     };
+  }, [handleObserver, loadMoreRef]);
 
-    fetchData();
-  }, [
-    mediaType,
-    providers,
-    language,
-    region,
-    page,
-    searchQuery,
-    genres,
-    sortBy,
-  ]);
+  const allResults = data?.pages.flatMap((page) => page.results) || [];
 
-  if (error) {
+  if (isError) {
     return (
       <div className="flex flex-col items-center justify-center py-12 gap-4 min-h-screen">
         <div className="mb-auto">
           <Alert color="danger" title="Error" className="mb-auto ">
-            {error}
+            {error.message || "An unexpected error occurred."}
           </Alert>
         </div>
       </div>
@@ -97,101 +113,73 @@ export default function MediaGridGrid({
 
   return (
     <div className="w-full mt-4">
-      {/* <Text size="xl" fw={600} mb="md">
-        {searchQuery
-          ? `Search results for "${searchQuery}"`
-          : `${mediaType === "movie" ? "Movies" : "TV Shows"} on ${providerName}`}
-      </Text> */}
-
-      {loading ? (
-        <>
+      <div className="min-h-screen" id="media-grid">
+        {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-4 min-h-screen">
             <Spinner variant="wave" className="mb-auto" />
           </div>
-        </>
-      ) : results.length > 0 ? (
-        <div className="min-h-screen" id="media-grid">
-          <div className="grid grid-cols-2 sm:grid-cols-5  gap-4">
-            {results.map((item) => (
-              <Card
-                className="max-w-sm"
-                isPressable
-                onPress={() =>
-                  setSelectedMedia({
-                    id: item.id,
-                    type: mediaType as "movie" | "tv",
-                  })
-                }
-                shadow="lg"
-                key={item.id}
-              >
-                <CardBody className="p-0 overflow-hidden">
-                  <div className="relative">
-                    <Image
-                      alt={item.title || item.name || "poster"}
-                      className="object-cover w-full aspect-[2/3]"
-                      src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
-                      radius="none"
-                    />
-                    <Chip
-                      startContent={
-                        <IconStar
-                          stroke={2}
-                          size={18}
-                          className="text-yellow-400"
-                        />
-                      }
-                      className="absolute top-2 right-2  z-10"
-                      color="default"
-                      variant="flat"
-                      size="sm"
-                    >
-                      <span className="text-sm text-white">
-                        {item.vote_average.toFixed(1)}
-                      </span>
-                    </Chip>
-                  </div>
-                </CardBody>
-                {/* <CardFooter className="flex flex-col items-start">
-                  <p className="font-bold">{item.title || item.name}</p>
-                  <div className="flex items-center mt-1 text-sm text-default-500">
-                    {item.release_date?.substring(0, 4) ||
-                      item.first_air_date?.substring(0, 4) ||
-                      "N/A"}
-                  </div>
-                </CardFooter> */}
-              </Card>
-            ))}
-          </div>
-          {totalPages > 1 && (
-            <div className="flex justify-center mt-16">
-              <Pagination
-                total={Math.min(totalPages, 500)}
-                page={page}
-                onChange={(newPage) => {
-                  onPageChange(newPage);
-                  document.getElementById('home')?.scrollIntoView({ 
-                    behavior: 'smooth',
-                    block: 'start'
-                  });
-                }}
-                showControls
-                color="primary"
-              />
+        ) : allResults.length > 0 ? (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+              {allResults.map((item) => (
+                <Card
+                  className="max-w-sm"
+                  isPressable
+                  onPress={() =>
+                    setSelectedMedia({
+                      id: item.id,
+                      type: filters.mediaType as "movie" | "tv",
+                    })
+                  }
+                  shadow="lg"
+                  key={`${item.id}-${item.title || item.name}`}
+                >
+                  <CardBody className="p-0 overflow-hidden">
+                    <div className="relative">
+                      <Image
+                        alt={item.title || item.name || "poster"}
+                        className="object-cover w-full aspect-[2/3]"
+                        src={`https://image.tmdb.org/t/p/w500${item.poster_path}`}
+                        radius="none"
+                      />
+                      <Chip
+                        startContent={
+                          <IconStar
+                            stroke={2}
+                            size={18}
+                            className="text-yellow-400"
+                          />
+                        }
+                        className="absolute top-2 right-2 z-10"
+                        color="default"
+                        variant="flat"
+                        size="sm"
+                      >
+                        <span className="text-sm text-white">
+                          {item.vote_average.toFixed(1)}
+                        </span>
+                      </Chip>
+                    </div>
+                  </CardBody>
+                </Card>
+              ))}
             </div>
-          )}
-        </div>
-      ) : (
-        <div className="flex flex-col items-center justify-center py-12 gap-4 min-h-screen">
-          <div className="mb-auto">
-            <Alert color="default">
-              {searchQuery
-                ? `No results found for "${searchQuery}". Try a different search term.`
-                : "No results found. Try different filters."}
-            </Alert>
+            <div ref={loadMoreRef} className="flex justify-center my-8">
+              {isFetchingNextPage && <Spinner size="md" color="primary" />}
+            </div>
+          </>
+        ) : (
+          <div className="flex flex-col items-center justify-center py-12 gap-4 min-h-screen">
+            <div className="mb-auto">
+              <Alert color="default">
+                {searchQuery
+                  ? `No results found for "${searchQuery}". Try a different search term.`
+                  : "No results found. Try different filters."}
+              </Alert>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {selectedMedia && (
         <MediaDetailModal2

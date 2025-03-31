@@ -2,7 +2,7 @@
 
 import { MediaFilters } from "@/types";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Tabs, Tab } from "@heroui/tabs";
 import { Divider } from "@heroui/divider";
 import { watchProviders } from "@/data/watchProviders";
@@ -29,6 +29,9 @@ import {
   IconTimezone,
 } from "@tabler/icons-react";
 import { Switch } from "@heroui/switch";
+import { discoverMedia } from "@/actions/movie-actions";
+import { useQuery } from "@tanstack/react-query";
+
 const sortOptions = [
   { value: "popularity.desc", label: "Popularity (High to Low)" },
   { value: "popularity.asc", label: "Popularity (Low to High)" },
@@ -245,7 +248,6 @@ export default function MediaBrowser() {
         <MediaGrid
           filters={filters}
           searchQuery={searchQuery}
-          onPageChange={(newPage) => updateFilters({ page: newPage })}
         />
       </div>
     </section>

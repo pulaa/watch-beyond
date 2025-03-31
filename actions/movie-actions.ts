@@ -1,6 +1,7 @@
 "use server";
 
 import { MediaFilters } from "@/types";
+import exp from "constants";
 
 
 export interface WatchProviders {
@@ -109,7 +110,6 @@ export async function discoverMedia(
   filters: MediaFilters
 ): Promise<MediaResponse> {
   const TMDB_TOKEN = process.env.TMDB_API_TOKEN;
-
   if (!TMDB_TOKEN) {
     throw new Error("API token not configured");
   }
@@ -295,3 +295,4 @@ export async function getExternalRatings(
     rotten_tomatoes_rating: undefined, // We don't have actual Rotten Tomatoes ratings
   };
 }
+
