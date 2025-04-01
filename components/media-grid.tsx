@@ -116,12 +116,12 @@ export default function MediaGridGrid({
       <div className="min-h-screen" id="media-grid">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center py-12 gap-4 min-h-screen">
-            <Spinner variant="wave" className="mb-auto" />
+            <Spinner size="md" color="primary" className="mb-auto" />
           </div>
         ) : allResults.length > 0 ? (
           <>
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
-              {allResults.map((item) => (
+              {allResults.map((item, index) => (
                 <Card
                   className="max-w-sm"
                   isPressable
@@ -132,7 +132,7 @@ export default function MediaGridGrid({
                     })
                   }
                   shadow="lg"
-                  key={`${item.id}-${item.title || item.name}`}
+                  key={`${item.id}-${item.title || item.name}-${index}`}
                 >
                   <CardBody className="p-0 overflow-hidden">
                     <div className="relative">

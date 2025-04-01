@@ -54,7 +54,7 @@ export default function MediaBrowser() {
     mediaType: searchParams.get("mediaType") || "movie",
     providers: searchParams.get("providers"),
     language: searchParams.get("language"),
-    region: searchParams.get("region") || "AU",
+    region: searchParams.get("region") || null,
     page: Number.parseInt(searchParams.get("page") || "1", 10),
     query: "",
     genres: searchParams.get("genres"),
@@ -83,7 +83,7 @@ export default function MediaBrowser() {
   );
   return (
     <section
-      className="flex flex-col items-center justify-center gap-4 pb-6 md:pb-10"
+      className="flex flex-col items-center justify-center gap-4  pb-36"
       id="home"
     >
       <div className="flex flex-col gap-6 w-full" id="media-browser">

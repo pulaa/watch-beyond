@@ -8,6 +8,7 @@ import { fontSans } from "@/config/fonts";
 import { SiteFooter } from "@/components/site-footer";
 import { HeroHighlightSection } from "@/components/hero";
 import { Analytics } from "@vercel/analytics/react";
+import { BackToTop } from "@/components/back-to-top";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -118,9 +119,13 @@ export default function RootLayout({
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           {/* <ReactQueryDevtools initialIsOpen={false} /> */}
           <HeroHighlightSection />
-          <main className="container mx-auto px-6 flex-grow ">{children}</main>
+          <main className="container mx-auto px-6 flex-grow ">
+            {children}
 
-          <SiteFooter className="px-6 bg-slate-900 " />
+            <BackToTop />
+          </main>
+
+          <SiteFooter className="px-6 bg-slate-900" />
         </Providers>
         <Analytics />
       </body>

@@ -19,16 +19,7 @@ export function HeroHighlightSection() {
   }, [debouncedValue, setSearchQuery]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0.0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{
-        delay: 0.3,
-        duration: 0.8,
-        ease: "easeInOut",
-      }}
-      className="relative flex flex-col gap-4 items-center justify-center px-4 py-10"
-    >
+    <div className="relative flex flex-col gap-4 items-center justify-center px-4 py-14">
       <h1 className="text-4xl md:text-7xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-b from-neutral-50 to-neutral-400 bg-opacity-50">
         Watch Beyond Borders with a VPN.
       </h1>
@@ -52,6 +43,6 @@ export function HeroHighlightSection() {
           clearSearch();
         }}
       />
-    </motion.div>
+    </div>
   );
 }
