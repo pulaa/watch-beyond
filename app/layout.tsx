@@ -9,6 +9,7 @@ import { SiteFooter } from "@/components/site-footer";
 import { HeroHighlightSection } from "@/components/hero";
 import { Analytics } from "@vercel/analytics/react";
 import { BackToTop } from "@/components/back-to-top";
+import { generateWebsiteStructuredData, generateOrganizationStructuredData } from "@/lib/seo";
 
 export const viewport: Viewport = {
   themeColor: [
@@ -33,6 +34,16 @@ export const metadata: Metadata = {
     "Disney+",
     "HBO Max",
     "Amazon Prime",
+    "Hulu",
+    "Paramount+",
+    "Apple TV+",
+    "streaming availability",
+    "vpn streaming",
+    "watch movies worldwide",
+    "geo-blocked content",
+    "streaming regions",
+    "TMDB",
+    "JustWatch",
   ],
   authors: [{ name: "Watch Beyond Team" }],
   creator: "Watch Beyond",
@@ -42,7 +53,7 @@ export const metadata: Metadata = {
     telephone: false,
     address: false,
   },
-  metadataBase: new URL("https://watchbeyond.com"),
+  metadataBase: new URL("https://watchbeyond.live"),
   alternates: {
     canonical: "/",
     languages: {
@@ -54,7 +65,7 @@ export const metadata: Metadata = {
     title: "Watch Beyond - Global Streaming Availability Finder",
     description:
       "Discover where to stream your favorite content worldwide with VPN integration for unrestricted access.",
-    url: "https://watchbeyond.com",
+    url: "https://watchbeyond.live",
     siteName: "Watch Beyond",
     images: [
       {
@@ -99,7 +110,7 @@ export const metadata: Metadata = {
       },
     ],
   },
-  manifest: "/site.webmanifest",
+  manifest: "/manifest.webmanifest",
   category: "entertainment",
 };
 export default function RootLayout({
@@ -109,7 +120,20 @@ export default function RootLayout({
 }) {
   return (
     <html suppressHydrationWarning lang="en">
-      <head />
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(generateWebsiteStructuredData()),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(generateOrganizationStructuredData()),
+          }}
+        />
+      </head>
       <body
         className={clsx(
           "min-h-screen bg-background font-sans antialiased",
